@@ -43,7 +43,8 @@ class UrtBot
   end
 
   def handle(nick,ident,cloak,channel,message)
-    if message.strip =~ /^\.urt (.*)/
+    case message.strip
+    when /^\.urt (.*)/
       host, port = $1.split(':', 2)
       port = port.to_i
       port = 27960 if port.zero?
