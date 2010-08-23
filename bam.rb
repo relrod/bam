@@ -33,7 +33,7 @@ class UrtBot
           player[:name] = "#{3.chr}03#{player[:name]}#{3.chr}" if player[:ping] == 999
           playersinfo << "#{player[:name].gsub(/ +/, ' ')} (Ping: #{player[:ping]}, Score: #{player[:score]})"
         end
-        return "Current map: #{2.chr}#{settings['mapname']}#{2.chr}. Players: #{playersinfo.join(', ')}"
+        return "Current map: #{2.chr}#{settings['mapname']}#{2.chr} (#{UrbanTerror.gameType(settings['g_gametype'])}). Players: #{playersinfo.join(', ')}"
       end
     rescue Timeout::Error
       return "A timeout occured."
