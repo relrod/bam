@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 require 'socket'
 require 'timeout'
-require File.join(File.dirname(__FILE__), "../urty", "urbanterror.rb")
+# require File.join(File.dirname(__FILE__), "../urty", "urbanterror.rb")
+require 'rubygems'
+require 'urbanterror'
 
 class UrtBot
   def initialize(nick,channels,server,port=6667)
