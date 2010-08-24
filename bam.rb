@@ -30,7 +30,7 @@ class UrtBot
         players = urt.players.sort_by { |player| -player[:score] }
         playersinfo = []
         players.each do |player|
-          player[:name] = "#{3.chr}03#{player[:name]}#{3.chr}" if player[:ping] == 999
+          player[:ping] = "#{3.chr}03#{player[:ping]}#{3.chr}" if player[:ping] == 999
           playersinfo << "#{player[:name].gsub(/ +/, ' ')} (Ping: #{player[:ping]}, Score: #{player[:score]})"
         end
         return "Current map: #{2.chr}#{settings['mapname']}#{2.chr} (#{UrbanTerror.matchType(settings['g_gametype'].to_i, true)}). Players: #{playersinfo.join(', ')}"
