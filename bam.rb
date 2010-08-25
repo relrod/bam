@@ -25,7 +25,7 @@ class UrtBot
   def urt_info(host, port)
     begin
       Timeout::timeout 5 do
-        urt = UrbanTerror.new(host, port)
+        urt = UrbanTerror.new(host, port.to_i)
         settings = urt.settings
         players = urt.players.sort_by { |player| -player[:score] }
         playersinfo = []
@@ -45,14 +45,17 @@ class UrtBot
   def handle(nick,ident,cloak,channel,message)
     case message.strip
     when /^\.urt (.*)/
-      host, port = $1.split(':', 2)
-      port = port.to_i
-      port = 27960 if port.zero?
-      host = @host_aliases[host] if @host_aliases.has_key? host
-      if host.empty?
-        privmsg(channel, "#{nick}: Use .urt hostname[:port]")
-      else
-        privmsg(channel, urt_info(host, port))
+      hosts = $1.split(';')
+      hosts.each do |host|
+        hostname, port = host.split(':', 2)
+        port = port.to_i
+        port = 27960 if port.zero?
+        hostname = @host_aliases[hostname] if @host_aliases.has_key? hostname
+        if host.empty?
+          privmsg(channel, "#{nick}: Use .urt hostname[:port]")
+        else
+          privmsg(channel, urt_info(hostname, port))
+        end
       end
     end
   end
@@ -75,5 +78,5 @@ class UrtBot
   end
 end
 
-bot = UrtBot.new('bam', ['#offtopic','#bots','#programming'], 'irc.ninthbit.net')
+bot = UrtBot.new('bam2', ['#offtopic','#bots','#programming'], 'irc.ninthbit.net')
 bot.run
