@@ -45,20 +45,16 @@ class UrtBot
   def handle(nick,ident,cloak,channel,message)
     case message.strip
     when /^\.urt (.*)/
-      hosts = $1.split(';')
-      alreadyused = []
+      hosts = $1.split(';').uniq
       hosts.each do |host|
-        if not alreadyused.include? host
-          hostname, port = host.split(':', 2)
-          port = port.to_i
-          port = 27960 if port.zero?
-          hostname = @host_aliases[hostname] if @host_aliases.has_key? hostname
-          if host.empty?
-            privmsg(channel, "#{nick}: Use .urt hostname[:port]")
-          else
-            privmsg(channel, urt_info(hostname, port))
-          end
-          alreadyused << host
+        hostname, port = host.split(':', 2)
+        port = port.to_i
+        port = 27960 if port.zero?
+        hostname = @host_aliases[hostname] if @host_aliases.has_key? hostname
+        if host.empty?
+          privmsg(channel, "#{nick}: Use .urt hostname[:port]")
+        else
+          privmsg(channel, urt_info(hostname, port))
         end
       end
     end
