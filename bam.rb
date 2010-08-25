@@ -49,7 +49,7 @@ class UrtBot
       alreadyused = []
       hosts.each do |host|
         alreadyused << host
-        if alreadyused.include? host
+        if not alreadyused.include? host
           hostname, port = host.split(':', 2)
           port = port.to_i
           port = 27960 if port.zero?
@@ -59,8 +59,6 @@ class UrtBot
           else
             privmsg(channel, urt_info(hostname, port))
           end
-        else
-          privmsg(channel, "#{hostname} was already checked in this query.")
         end
       end
     end
