@@ -48,7 +48,6 @@ class UrtBot
       hosts = $1.split(';')
       alreadyused = []
       hosts.each do |host|
-        alreadyused << host
         if not alreadyused.include? host
           hostname, port = host.split(':', 2)
           port = port.to_i
@@ -59,6 +58,7 @@ class UrtBot
           else
             privmsg(channel, urt_info(hostname, port))
           end
+          alreadyused << host
         end
       end
     end
