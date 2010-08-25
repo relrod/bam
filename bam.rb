@@ -46,15 +46,21 @@ class UrtBot
     case message.strip
     when /^\.urt (.*)/
       hosts = $1.split(';')
+      alreadyused = []
       hosts.each do |host|
-        hostname, port = host.split(':', 2)
-        port = port.to_i
-        port = 27960 if port.zero?
-        hostname = @host_aliases[hostname] if @host_aliases.has_key? hostname
-        if host.empty?
-          privmsg(channel, "#{nick}: Use .urt hostname[:port]")
+        alreadyused << host
+        if alreadyused.include? host
+          hostname, port = host.split(':', 2)
+          port = port.to_i
+          port = 27960 if port.zero?
+          hostname = @host_aliases[hostname] if @host_aliases.has_key? hostname
+          if host.empty?
+            privmsg(channel, "#{nick}: Use .urt hostname[:port]")
+          else
+            privmsg(channel, urt_info(hostname, port))
+          end
         else
-          privmsg(channel, urt_info(hostname, port))
+          privmsg(channel, "#{hostname} was already checked in this query.")
         end
       end
     end
