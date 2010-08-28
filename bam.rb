@@ -31,14 +31,17 @@ class UrtBot
         playersinfo = []
         players.each do |player|
           player[:ping] = "#{3.chr}04#{player[:ping]}#{3.chr}" if player[:ping] == 999
-          playersinfo << "#{player[:name].gsub(/ +/, ' ')} (Ping: #{player[:ping]}, Score: #{player[:score]})"
+          playersinfo << "#{player[:name].gsub(/ +/, ' ')} (#{player[:ping]})"
         end
-        return "Current map: #{2.chr}#{settings['mapname']}#{2.chr} (#{UrbanTerror.matchType(settings['g_gametype'].to_i, true)}). Players: #{playersinfo.join(', ')}"
+        weapons = UrbanTerror.reverseGearCalc(settings['g_gear'].to_i)
+        weapons = weapons.size == 6 ? 'all weapons' : weapons.join(', ')
+        gametype = UrbanTerror.matchType(settings['g_gametype'].to_i, true)
+        "Map: #{2.chr}#{settings['mapname']}#{2.chr} (#{gametype} w/ #{weapons}). Players: #{playersinfo.join(', ')}"
       end
     rescue Timeout::Error
-      return "A timeout occured."
+      "A timeout occured."
     rescue
-      return "An error has occured. Check your syntax and try again."
+      "An error has occured. Check your syntax and try again."
     end
   end
 
@@ -82,5 +85,5 @@ class UrtBot
   end
 end
 
-bot = UrtBot.new('bam2', ['#offtopic','#bots','#programming'], 'irc.ninthbit.net')
+bot = UrtBot.new('bam3', ['#offtopic','#bots','#programming'], 'jade.ninthbit.net', 6664)
 bot.run
