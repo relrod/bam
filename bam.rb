@@ -30,8 +30,8 @@ class UrtBot
         players = urt.players.sort_by { |player| -player[:score] }
         playersinfo = []
         players.each do |player|
-          player[:ping] = "#{3.chr}04#{player[:ping]}#{3.chr}" if player[:ping] == 999
-          playersinfo << "#{player[:name].gsub(/ +/, ' ')} (#{player[:ping]})"
+          player[:name] = "#{3.chr}04#{player[:name]}#{3.chr}" if player[:ping] == 999
+          playersinfo << "#{player[:name].gsub(/ +/, ' ')} (#{player[:score]})"
         end
         weapons = UrbanTerror.reverseGearCalc(settings['g_gear'].to_i)
         weapons = weapons.size == 6 ? 'all weapons' : weapons.join(', ')
