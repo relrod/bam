@@ -109,5 +109,5 @@ class UrtBot
   end
 end
 
-bot = UrtBot.new('bam321', ['#offtopic','#bots','#programming'], 'jade.ninthbit.net', 6664)
+bot = UrtBot.new('bam', ['#offtopic','#bots','#programming'], 'jade.ninthbit.net', 6664)
 bot.run
