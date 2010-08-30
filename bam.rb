@@ -102,7 +102,7 @@ class UrtBot
       elsif not @rcon[hostname]['admins'].include? cloak
         reply "You are not listed as an admin of #{hostname}."
       else
-        urt = UrbanTerror.new(hostname, port, @rcon[hostname][password])
+        urt = UrbanTerror.new(hostname, port, @rcon[hostname]['password'])
         urt.rcon cmd
         reply "[SENT] \\rcon #{cmd}"
       end
