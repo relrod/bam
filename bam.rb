@@ -7,6 +7,7 @@ require 'urbanterror'
 
 class UrtBot
   def initialize(nick,channels,server,port=6667)
+    @botnick = nick
     @channels = channels
     @socket = TCPSocket.open(server, port)
     @socket.puts "NICK #{nick}"
@@ -94,6 +95,8 @@ class UrtBot
     while line = @socket.gets
       puts line
       case line
+      when /^:[\w.-]+ 433/
+        @socket.puts "NICK #{@botnick}#{rand 100}"
       when /^:[\w.-]+ 001/
         # Join channels
         @channels.each do |channel|
@@ -109,8 +112,5 @@ class UrtBot
   end
 end
 
-hostname = Socket.gethostname
-nick = (hostname == 'devel001' or hostname == 'internal001' ? 'bam' : "bam#{rand 100}")
-
-bot = UrtBot.new(nick, ['#offtopic','#bots','#programming'], 'jade.ninthbit.net', 6664)
+bot = UrtBot.new('bam', ['#offtopic','#bots','#programming'], 'jade.ninthbit.net', 6664)
 bot.run
