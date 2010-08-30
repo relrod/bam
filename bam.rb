@@ -90,6 +90,10 @@ class UrtBot
         end
       end
     when /^\.rcon (.*)/
+      if not @admins.include? cloak
+        reply "You are not authorized to perform this command. Your cloak (#{cloak}) is not in the admins list."
+        return
+      end
       hostname, cmd = $1.split(' ', 2)
       hostname = @host_aliases[hostname] if @host_aliases.has_key? hostname
       hostname, port = hostname.split(':', 2)
@@ -141,5 +145,5 @@ class UrtBot
 end
 
 admins = ['Bit/CodeBlock/fedora']
-bot = UrtBot.new('bam2', ['#offtopic', '#bots', '#programming'], admins, 'irc.ninthbit.net', 6697, true)
+bot = UrtBot.new('bam', ['#offtopic', '#bots', '#programming'], admins, 'irc.ninthbit.net', 6697, true)
 bot.run
