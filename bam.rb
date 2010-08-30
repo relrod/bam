@@ -141,5 +141,5 @@ class UrtBot
 end
 
 admins = ['Bit/CodeBlock/fedora']
-bot = UrtBot.new('bam2', ['#offtopic'], admins, 'irc.ninthbit.net', 6697, true)
+bot = UrtBot.new('bam2', ['#offtopic', '#bots', '#programming'], admins, 'irc.ninthbit.net', 6697, true)
 bot.run
