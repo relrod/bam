@@ -110,11 +110,7 @@ class UrtBot
 end
 
 hostname = Socket.gethostname
-if hostname == 'devel001' or hostname == 'internal001'
-  nick = 'bam'
-else
-  nick = "bam#{rand 100}"
-end
+nick = (hostname == 'devel001' or hostname == 'internal001' ? 'bam' : "bam#{rand 100}")
 
 bot = UrtBot.new(nick, ['#offtopic','#bots','#programming'], 'jade.ninthbit.net', 6664)
 bot.run
