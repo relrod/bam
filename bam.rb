@@ -1,21 +1,32 @@
 #!/usr/bin/env ruby
 require 'socket'
 require 'timeout'
-# require File.join(File.dirname(__FILE__), "../urty", "urbanterror.rb")
+require 'yaml'
 require 'rubygems'
 require 'urbanterror'
 
 class UrtBot
-  def initialize(nick,channels,server,port=6667)
+  def initialize(nick,channels,admins,server,port=6667, ssl=false)
     @botnick = nick
     @channels = channels
     @socket = TCPSocket.open(server, port)
+    if ssl
+      require 'openssl'
+      ssl_context = OpenSSL::SSL::SSLContext.new()
+      ssl_context.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      @socket = OpenSSL::SSL::SSLSocket.new(@socket, ssl_context)
+      @socket.sync = true
+      @socket.connect
+    end
+      
     @socket.puts "NICK #{nick}"
     @socket.puts "USER #{nick} #{nick} #{nick} #{nick}"
+    @admins = admins
+    @rcon_passwords = YAML.load_file(File.join(File.dirname(__FILE__), 'rcon.yml'))
     @host_aliases = {
       'mn' => 'mostlynothing.info',
       'mi' => 'mostlyincorrect.info',
-      'e' => 'elrod.me',
+      'e' => 'games.elrod.me',
     }
   end
   
@@ -47,8 +58,8 @@ class UrtBot
       end
     rescue Timeout::Error
       "A timeout occured."
-    rescue
-      "An error has occured. Check your syntax and try again."
+    # rescue
+    #   "An error has occured. Check your syntax and try again."
     end
   end
   
@@ -58,7 +69,7 @@ class UrtBot
 
   def handle(nick,ident,cloak,channel,message)
     case message.strip
-    when /^\.urt (.*)/
+    when /^\-urt (.*)/
       hosts = $1.split(';')
       alreadyused = []
       hosts.each do |host|
@@ -74,6 +85,20 @@ class UrtBot
           end
           alreadyused << host
         end
+      end
+    when /^\.rcon (.*)/
+      hostname, cmd = $1.split(' ', 2)
+      hostname = @host_aliases[hostname] if @host_aliases.has_key? hostname
+      hostname, port = hostname.split(':', 2)
+      
+      port = port.to_i
+      port = 27960 if port.zero?
+      if not @rcon_passwords.has_key? hostname
+        reply "That hostname (#{hostname}) was not a member of the rcon-passwords configuration file."
+      else
+        urt = UrbanTerror.new(hostname, port, @rcon_passwords[hostname])
+        urt.rcon cmd
+        reply "[SENT] \\rcon #{cmd}"
       end
     when /^\.gear (.*)/
       origline = $1
@@ -112,5 +137,6 @@ class UrtBot
   end
 end
 
-bot = UrtBot.new('bam', ['#offtopic','#bots','#programming'], 'jade.ninthbit.net', 6664)
+admins = ['Bit/CodeBlock/fedora']
+bot = UrtBot.new('bam2', ['#offtopic'], admins, 'irc.ninthbit.net', 6697, true)
 bot.run
