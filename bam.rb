@@ -73,7 +73,7 @@ class UrtBot
 
   def handle(nick,ident,cloak,channel,message)
     case message.strip
-    when /^#{@comchar}\.urt (.*)/
+    when /^#{@comchar}urt (.*)/
       hosts = $1.split(';')
       alreadyused = []
       hosts.each do |host|
