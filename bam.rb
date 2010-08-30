@@ -148,7 +148,7 @@ end
 current_host = Socket.gethostname
 
 if current_host == 'devel001' or current_host == 'internal001'
-  bot = UrtBot.new('bam', ['#offtopic', '#bots', '#programming'], '.', 'irc.ninthbit.net', 6667, false)
+  bot = UrtBot.new('bam', ['#offtopic', '#bots', '#programming'], '\.', 'irc.ninthbit.net', 6667, false)
 else
   bot = UrtBot.new("bam#{rand 100}", ['#bots'], '-', 'irc.ninthbit.net', 6697, true)
 end
