@@ -145,5 +145,13 @@ class UrtBot
 end
 
 admins = ['Bit/CodeBlock/fedora']
-bot = UrtBot.new('bam', ['#offtopic', '#bots', '#programming'], admins, 'irc.ninthbit.net', 6697, true)
+
+current_host = Socket.gethostname
+
+if current_host == 'devel001' or current_host == 'internal001'
+  bot = UrtBot.new('bam', ['#offtopic', '#bots', '#programming'], admins, 'irc.ninthbit.net', 6667, false)
+else
+  bot = UrtBot.new("bam#{rand 100}", ['#bots'], admins, 'irc.ninthbit.net', 6697, true)
+end
+
 bot.run
