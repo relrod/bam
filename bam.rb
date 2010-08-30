@@ -6,9 +6,10 @@ require 'rubygems'
 require 'urbanterror'
 
 class UrtBot
-  def initialize(nick,channels,admins,server,port=6667, ssl=false)
+  def initialize(nick,channels,comchar,admins,server,port=6667, ssl=false)
     @botnick = nick
     @channels = channels
+    @comchar = comchar
     @socket = TCPSocket.open(server, port)
     if ssl
       # This general idea/method of doing this was taken from an early
@@ -72,7 +73,7 @@ class UrtBot
 
   def handle(nick,ident,cloak,channel,message)
     case message.strip
-    when /^\-urt (.*)/
+    when /^#{@comchar}\.urt (.*)/
       hosts = $1.split(';')
       alreadyused = []
       hosts.each do |host|
@@ -89,7 +90,7 @@ class UrtBot
           alreadyused << host
         end
       end
-    when /^\.rcon (.*)/
+    when /^#{@comchar}rcon (.*)/
       if not @admins.include? cloak
         reply "You are not authorized to perform this command. Your cloak (#{cloak}) is not in the admins list."
         return
@@ -107,7 +108,7 @@ class UrtBot
         urt.rcon cmd
         reply "[SENT] \\rcon #{cmd}"
       end
-    when /^\.gear (.*)/
+    when /^#{@comchar}gear (.*)/
       origline = $1
       begin
         if origline =~ /^-?\d+$/
@@ -149,9 +150,9 @@ admins = ['Bit/CodeBlock/fedora']
 current_host = Socket.gethostname
 
 if current_host == 'devel001' or current_host == 'internal001'
-  bot = UrtBot.new('bam', ['#offtopic', '#bots', '#programming'], admins, 'irc.ninthbit.net', 6667, false)
+  bot = UrtBot.new('bam', ['#offtopic', '#bots', '#programming'], '.', admins, 'irc.ninthbit.net', 6667, false)
 else
-  bot = UrtBot.new("bam#{rand 100}", ['#bots'], admins, 'irc.ninthbit.net', 6697, true)
+  bot = UrtBot.new("bam#{rand 100}", ['#bots'], '-', admins, 'irc.ninthbit.net', 6697, true)
 end
 
 bot.run
