@@ -6,7 +6,7 @@ require 'rubygems'
 require 'urbanterror'
 
 class UrtBot
-  def initialize(nick,channels,comchar,admins,server,port=6667, ssl=false)
+  def initialize(nick,channels,comchar,server,port=6667, ssl=false)
     @botnick = nick
     @channels = channels
     @comchar = comchar
@@ -25,8 +25,7 @@ class UrtBot
       
     @socket.puts "NICK #{nick}"
     @socket.puts "USER #{nick} #{nick} #{nick} #{nick}"
-    @admins = admins
-    @rcon_passwords = YAML.load_file(File.join(File.dirname(__FILE__), 'rcon.yml'))
+    @rcon = YAML.load_file(File.join(File.dirname(__FILE__), 'rcon.yml'))
     @host_aliases = {
       'mn' => 'mostlynothing.info',
       'mi' => 'mostlyincorrect.info',
@@ -91,20 +90,19 @@ class UrtBot
         end
       end
     when /^#{@comchar}rcon (.*)/
-      if not @admins.include? cloak
-        reply "You are not authorized to perform this command. Your cloak (#{cloak}) is not in the admins list."
-        return
-      end
+      # Get hostname, port, command
       hostname, cmd = $1.split(' ', 2)
       hostname = @host_aliases[hostname] if @host_aliases.has_key? hostname
       hostname, port = hostname.split(':', 2)
-      
       port = port.to_i
       port = 27960 if port.zero?
-      if not @rcon_passwords.has_key? hostname
+      
+      if not @rcon.has_key? hostname
         reply "That hostname (#{hostname}) was not a member of the rcon-passwords configuration file."
+      elsif not @rcon[hostname]['admins'].include? cloak
+        reply "You are not listed as an admin of #{hostname}."
       else
-        urt = UrbanTerror.new(hostname, port, @rcon_passwords[hostname])
+        urt = UrbanTerror.new(hostname, port, @rcon[hostname][password])
         urt.rcon cmd
         reply "[SENT] \\rcon #{cmd}"
       end
@@ -126,6 +124,8 @@ class UrtBot
   
   def run
     while line = @socket.gets
+      # Reload the passwords file every time, so we don't have to restart the bot every time.
+      @rcon = YAML.load_file(File.join(File.dirname(__FILE__), 'rcon.yml'))
       puts line
       case line
       when /^:[\w.-]+ 433/
@@ -145,14 +145,12 @@ class UrtBot
   end
 end
 
-admins = ['Bit/CodeBlock/fedora', 'Byte/scott']
-
 current_host = Socket.gethostname
 
 if current_host == 'devel001' or current_host == 'internal001'
-  bot = UrtBot.new('bam', ['#offtopic', '#bots', '#programming'], '.', admins, 'irc.ninthbit.net', 6667, false)
+  bot = UrtBot.new('bam', ['#offtopic', '#bots', '#programming'], '.', 'irc.ninthbit.net', 6667, false)
 else
-  bot = UrtBot.new("bam#{rand 100}", ['#bots'], '-', admins, 'irc.ninthbit.net', 6697, true)
+  bot = UrtBot.new("bam#{rand 100}", ['#bots'], '-', 'irc.ninthbit.net', 6697, true)
 end
 
 bot.run
