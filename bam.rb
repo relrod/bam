@@ -145,7 +145,7 @@ class UrtBot
   end
 end
 
-admins = ['Bit/CodeBlock/fedora']
+admins = ['Bit/CodeBlock/fedora', 'Byte/scott']
 
 current_host = Socket.gethostname
 
