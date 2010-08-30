@@ -11,6 +11,9 @@ class UrtBot
     @channels = channels
     @socket = TCPSocket.open(server, port)
     if ssl
+      # This general idea/method of doing this was taken from an early
+      # version of Scott Olson's on_irc library.
+      # See http://github.com/tsion/on_irc
       require 'openssl'
       ssl_context = OpenSSL::SSL::SSLContext.new()
       ssl_context.verify_mode = OpenSSL::SSL::VERIFY_NONE
