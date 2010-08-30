@@ -61,8 +61,8 @@ class UrtBot
       end
     rescue Timeout::Error
       "A timeout occured."
-    # rescue
-    #   "An error has occured. Check your syntax and try again."
+    rescue
+      "An error has occured. Check your syntax and try again."
     end
   end
   
