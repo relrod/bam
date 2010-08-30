@@ -44,6 +44,10 @@ class UrtBot
       "An error has occured. Check your syntax and try again."
     end
   end
+  
+  def reply(message)
+    privmsg(@channel, "#{@nick}: #{message}")
+  end
 
   def handle(nick,ident,cloak,channel,message)
     case message.strip
@@ -57,12 +61,25 @@ class UrtBot
           port = 27960 if port.zero?
           hostname = @host_aliases[hostname] if @host_aliases.has_key? hostname
           if host.empty?
-            privmsg(channel, "#{nick}: Use .urt hostname[:port]")
+            reply "Use .urt hostname[:port]"
           else
-            privmsg(channel, urt_info(hostname, port))
+            reply urt_info(hostname, port)
           end
           alreadyused << host
         end
+      end
+    when /^\.gear (.*)/
+      origline = $1
+      begin
+        if origline =~ /^-?\d+$/
+          weapons = UrbanTerror.reverseGearCalc(origline.to_i).join(', ')
+          reply "#{weapons}"
+        else
+          number = UrbanTerror.gearCalc(origline.gsub(' ','').split(','))
+          reply "#{number}"
+        end
+      rescue => error
+        reply "#{error.message}"
       end
     end
   end
@@ -79,6 +96,7 @@ class UrtBot
       when /PING :(.*)/
         @socket.puts "PONG :#{$1}}"
       when /^:(.*)!(.*)@(.*) PRIVMSG (.*) :(.*)/
+        @nick, @ident, @cloak, @channel, @message = $1, $2, $3, $4, $5
         handle($1,$2,$3,$4,$5)
       end
     end
