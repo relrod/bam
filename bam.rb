@@ -29,14 +29,20 @@ class UrtBot
         settings = urt.settings
         players = urt.players.sort_by { |player| -player[:score] }
         playersinfo = []
-        players.each do |player|
-          player[:name] = "#{3.chr}04#{player[:name]}#{3.chr}" if player[:ping] == 999
-          playersinfo << "#{player[:name].gsub(/ +/, ' ')} (#{player[:score]})"
+        if players.count != 0
+          players.each do |player|
+            player[:name] = "#{3.chr}04#{player[:name]}#{3.chr}" if player[:ping] == 999
+            playersinfo << "#{player[:name].gsub(/ +/, ' ')} (#{player[:score]})"
+          end
+          players = playersinfo.join(', ')
+        else
+          players << "None."
         end
         weapons = UrbanTerror.reverseGearCalc(settings['g_gear'].to_i)
         weapons = weapons.size == 6 ? 'all weapons' : weapons.join(', ')
         gametype = UrbanTerror.matchType(settings['g_gametype'].to_i, true)
-        "Map: #{2.chr}#{settings['mapname']}#{2.chr} (#{gametype} w/ #{weapons}). Players: #{playersinfo.join(', ')}"
+        
+        "Map: #{2.chr}#{settings['mapname']}#{2.chr} (#{gametype} w/ #{weapons}). Players: #{players}"
       end
     rescue Timeout::Error
       "A timeout occured."
@@ -103,5 +109,5 @@ class UrtBot
   end
 end
 
-bot = UrtBot.new('bam', ['#offtopic','#bots','#programming'], 'jade.ninthbit.net', 6664)
+bot = UrtBot.new('bam321', ['#offtopic','#bots','#programming'], 'jade.ninthbit.net', 6664)
 bot.run
