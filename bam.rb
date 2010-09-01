@@ -49,9 +49,9 @@ class UrtBot
             player[:name] = "#{3.chr}04#{player[:name]}#{3.chr}" if player[:ping] == 999
             playersinfo << "#{player[:name].gsub(/ +/, ' ')} (#{player[:score]})"
           end
-          players = playersinfo.join(', ')
+          players = "Players: #{playersinfo.join(', ')}"
         else
-          players << "None."
+          players = "No players."
         end
         weapons = UrbanTerror.reverseGearCalc(settings['g_gear'].to_i)
         weapons = weapons.size == 6 ? 'all weapons' : weapons.join(', ')
