@@ -57,7 +57,7 @@ class UrtBot
         weapons = weapons.size == 6 ? 'all weapons' : weapons.join(', ')
         gametype = UrbanTerror.matchType(settings['g_gametype'].to_i, true)
         
-        "Map: #{2.chr}#{settings['mapname']}#{2.chr} (#{gametype} w/ #{weapons}). Players: #{players}"
+        "Map: #{2.chr}#{settings['mapname']}#{2.chr} (#{gametype} w/ #{weapons}). #{players}"
       end
     rescue Timeout::Error
       "A timeout occured."
