@@ -72,7 +72,7 @@ class UrtBot
   
   def reply(message)
     breakmessage(message).each do |m|
-      privmsg(@channel, "#{nick}: #{m}")
+      privmsg(@channel, "#{@nick}: #{m}")
     end
   end
 
