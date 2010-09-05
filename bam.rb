@@ -54,7 +54,14 @@ class UrtBot
           players = "No players."
         end
         weapons = UrbanTerror.reverseGearCalc(settings['g_gear'].to_i)
-        weapons = weapons.size == 6 ? 'all weapons' : weapons.join(', ')
+        weapons = case weapons.size
+        when 0
+          'knives'
+        when 6
+          'all weapons'
+        else
+          weapons.join(', ')
+        end
         gametype = UrbanTerror.matchType(settings['g_gametype'].to_i, true)
         
         "Map: #{2.chr}#{settings['mapname']}#{2.chr} (#{gametype} w/ #{weapons}). #{players}"
@@ -156,7 +163,7 @@ current_host = Socket.gethostname
 if current_host == 'devel001' or current_host == 'internal001'
   bot = UrtBot.new('bam', ['#offtopic', '#bots', '#programming'], '\.', 'irc.ninthbit.net', 6667, false)
 else
-  bot = UrtBot.new("bam#{rand 100}", ['#bots'], '-', 'irc.ninthbit.net', 6697, true)
+  bot = UrtBot.new("bam#{rand 100}", ['#bots'], '-', 'irc.ninthbit.net', 6667, false) # Yay crappy irc networks which only have like 3% of servers that support ssl.
 end
 
 bot.run
