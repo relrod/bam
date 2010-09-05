@@ -67,13 +67,12 @@ class UrtBot
   end
   
   def breakmessage(message)
-    return message.scan(/.{1,505}/)
+    return message.scan(/.{1,470}/)
   end
   
   def reply(message)
-    message = "#{@nick}: #{message}"
     breakmessage(message).each do |m|
-      privmsg(@channel, m)
+      reply m
     end
   end
 
