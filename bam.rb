@@ -3,6 +3,9 @@ require 'socket'
 require 'timeout'
 require 'yaml'
 require 'rubygems'
+require 'open-uri'
+require 'rss/2.0' # URT News
+require 'sanitize'
 require 'urbanterror'
 
 class UrtBot
@@ -69,6 +72,17 @@ class UrtBot
       "A timeout occured."
     rescue => error
       "[ERROR] #{error.message} (check your syntax and try again)."
+    end
+  end
+  
+  def news
+    begin
+      content = ''
+      open('http://www.urbanterror.info/rss/news/all/') {|p| content = p.read }
+      rss = RSS::Parser.parse(content, false).items[0]
+      "Latest UrT news: #{rss.title} <#{rss.link}>, posted on #{rss.pubDate}. #{rss.description.gsub(/<\/?[^>]*>/, "")}"
+    rescue => error
+      "[ERROR] #{error.message}"
     end
   end
   
