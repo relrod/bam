@@ -41,34 +41,30 @@ class UrtBot
   
   def urt_info(host, port)
     begin
-      Timeout::timeout 5 do
-        urt = UrbanTerror.new(host, port.to_i)
-        settings = urt.settings
-        players = urt.players.sort_by { |player| -player[:score] }
-        playersinfo = []
-        if players.count != 0
-          players.each do |player|
-            player[:name] = "#{3.chr}04#{player[:name]}#{3.chr}" if player[:ping] == 999
-            playersinfo << "#{player[:name].gsub(/ +/, ' ')} (#{player[:score]})"
-          end
-          players = "Players: #{playersinfo.join(', ')}"
-        else
-          players = "No players."
+      urt = UrbanTerror.new(host, port.to_i)
+      settings = urt.settings
+      players = urt.players.sort_by { |player| -player[:score] }
+      playersinfo = []
+      if players.count != 0
+        players.each do |player|
+          player[:name] = "#{3.chr}04#{player[:name]}#{3.chr}" if player[:ping] == 999
+          playersinfo << "#{player[:name].gsub(/ +/, ' ')} (#{player[:score]})"
         end
-        weapons = UrbanTerror.reverseGearCalc(settings['g_gear'].to_i)
-        weapons = case weapons.size
-        when 0
-          'knives'
-        when 6
-          'all weapons'
-        else
-          weapons.join(', ')
-        end
+        players = "Players: #{playersinfo.join(', ')}"
+      else
+        players = "No players."
+      end
+      weapons = UrbanTerror.reverseGearCalc(settings['g_gear'].to_i)
+      weapons = case weapons.size
+      when 0
+        'knives'
+      when 6
+        'all weapons'
+      else
+        weapons.join(', ')
+      end
         gametype = UrbanTerror.matchType(settings['g_gametype'].to_i, true)
         "Map: #{2.chr}#{settings['mapname']}#{2.chr} (#{gametype} w/ #{weapons}). #{players}"
-      end
-    rescue Timeout::Error
-      "A timeout occured."
     rescue => error
       "[ERROR] #{error.message} (check your syntax and try again)."
     end
@@ -92,54 +88,60 @@ class UrtBot
   end
 
   def handle(nick,ident,cloak,channel,message)
-    case message.strip
-    when /^#{@comchar}urt (.*)/
-      hosts = $1.split(';')
-      alreadyused = []
-      hosts.each do |host|
-        if not alreadyused.include? host
-          hostname, port = host.split(':', 2)
+    begin
+      Timeout::timeout 5 do
+        case message.strip
+        when /^#{@comchar}urt (.*)/
+          hosts = $1.split(';')
+          alreadyused = []
+          hosts.each do |host|
+            if not alreadyused.include? host
+              hostname, port = host.split(':', 2)
+              port = port.to_i
+              port = 27960 if port.zero?
+              hostname = @host_aliases[hostname] if @host_aliases.has_key? hostname
+              if host.empty?
+                reply "Use .urt hostname[:port]"
+              else
+                reply urt_info(hostname, port)
+              end
+              alreadyused << host
+            end
+          end
+        when /^#{@comchar}rcon (.*)/
+          # Get hostname, port, command
+          hostname, cmd = $1.split(' ', 2)
+          hostname = @host_aliases[hostname] if @host_aliases.has_key? hostname
+          hostname, port = hostname.split(':', 2)
           port = port.to_i
           port = 27960 if port.zero?
-          hostname = @host_aliases[hostname] if @host_aliases.has_key? hostname
-          if host.empty?
-            reply "Use .urt hostname[:port]"
-          else
-            reply urt_info(hostname, port)
-          end
-          alreadyused << host
-        end
-      end
-    when /^#{@comchar}rcon (.*)/
-      # Get hostname, port, command
-      hostname, cmd = $1.split(' ', 2)
-      hostname = @host_aliases[hostname] if @host_aliases.has_key? hostname
-      hostname, port = hostname.split(':', 2)
-      port = port.to_i
-      port = 27960 if port.zero?
       
-      if not @rcon.has_key? hostname
-        reply "That hostname (#{hostname}) was not a member of the rcon-passwords configuration file."
-      elsif not @rcon[hostname]['admins'].include? cloak
-        reply "You are not listed as an admin of #{hostname}."
-      else
-        urt = UrbanTerror.new(hostname, port, @rcon[hostname]['password'])
-        urt.rcon cmd
-        reply "[SENT] \\rcon #{cmd}"
-      end
-    when /^#{@comchar}gear (.*)/
-      origline = $1
-      begin
-        if origline =~ /^-?\d+$/
-          weapons = UrbanTerror.reverseGearCalc(origline.to_i).join(', ')
-          reply "#{weapons}"
-        else
-          number = UrbanTerror.gearCalc(origline.gsub(' ','').split(','))
-          reply "#{number}"
+          if not @rcon.has_key? hostname
+            reply "That hostname (#{hostname}) was not a member of the rcon-passwords configuration file."
+          elsif not @rcon[hostname]['admins'].include? cloak
+            reply "You are not listed as an admin of #{hostname}."
+          else
+            urt = UrbanTerror.new(hostname, port, @rcon[hostname]['password'])
+            urt.rcon cmd
+            reply "[SENT] \\rcon #{cmd}"
+          end
+        when /^#{@comchar}gear (.*)/
+          origline = $1
+          begin
+            if origline =~ /^-?\d+$/
+              weapons = UrbanTerror.reverseGearCalc(origline.to_i).join(', ')
+              reply "#{weapons}"
+            else
+              number = UrbanTerror.gearCalc(origline.gsub(' ','').split(','))
+              reply "#{number}"
+            end
+          rescue => error
+            reply "#{error.message}"
+          end
         end
-      rescue => error
-        reply "#{error.message}"
       end
+    rescue Timeout::Error
+      reply "A timeout occured."
     end
   end
   
