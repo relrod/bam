@@ -5,7 +5,6 @@ require 'yaml'
 require 'rubygems'
 require 'open-uri'
 require 'rss/2.0' # URT News
-require 'sanitize'
 require 'urbanterror'
 
 class UrtBot
