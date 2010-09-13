@@ -82,9 +82,24 @@ class UrtBot
     end
   end
   
+  def shortenurl(url)
+    puts url
+    newurl = ''
+    open("http://is.gd/api.php?longurl=#{url}") {|p| newurl = p.read }
+    return newurl
+  end
+  
   def reply(message, truncate=false)
     messages = message.scan(/.{1,420}/)
-    puts messages.count
+    
+    messages.each do |message|
+      urls = message.split.reject {|w| w !~ /https?\:.+/ }
+      urls.each do |url|
+        url =~ /(https?\:[\w\d\-\\\/\.]+)/i
+        message.gsub!($1, shortenurl($1))
+      end
+    end
+    
     if truncate
       privmsg(@channel, "#{@nick}: #{messages[0]}#{'...' if messages.count > 1}")
     else
@@ -92,6 +107,7 @@ class UrtBot
         privmsg(@channel, "#{@nick}: #{m}")
       end
     end
+    
   end
 
   def handle(nick,ident,cloak,channel,message)
@@ -183,7 +199,7 @@ loop do
   if current_host == 'devel001' or current_host == 'internal001'
     bot = UrtBot.new('bam', ['#offtopic', '#bots', '#programming'], '\.', 'irc.ninthbit.net', 6667, false)
   else
-    bot = UrtBot.new("bam#{rand 100}", ['#bots'], '-', 'irc.ninthbit.net', 6667, false) # Yay crappy irc networks which only have like 3% of servers that support ssl.
+    bot = UrtBot.new("bam#{rand 100}", ['#programming'], '-', 'irc.ninthbit.net', 6667, false) # Yay crappy irc networks which only have like 3% of servers that support ssl.
   end
 
   bot.run
