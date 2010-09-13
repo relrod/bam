@@ -37,6 +37,7 @@ class UrtBot
   
   def privmsg(channel, message)
     @socket.puts "PRIVMSG #{channel} :#{message}"
+    puts "PRIVMSG #{channel} :#{message}"
   end
   
   def urt_info(host, port)
@@ -75,15 +76,21 @@ class UrtBot
       content = ''
       open('http://www.urbanterror.info/rss/news/all/') {|p| content = p.read }
       rss = RSS::Parser.parse(content, false).items[0]
-      "Latest UrT news: #{rss.title} <#{rss.link}>, posted on #{rss.pubDate}. #{rss.description.gsub(/<\/?[^>]*>/, "")}"
+      "#{2.chr}#{rss.title}#{2.chr} (#{rss.pubDate}) <#{rss.link}>: #{rss.description.gsub(/<\/?[^>]*>/, "")}"
     rescue => error
       "[ERROR] #{error.message}"
     end
   end
   
-  def reply(message)
-    message.scan(/.{1,470}/).each do |m|
-      privmsg(@channel, "#{@nick}: #{m}")
+  def reply(message, truncate=false)
+    messages = message.scan(/.{1,420}/)
+    puts messages.count
+    if truncate
+      privmsg(@channel, "#{@nick}: #{messages[0]}#{'...' if messages.count > 1}")
+    else
+      messages.each do |m|
+        privmsg(@channel, "#{@nick}: #{m}")
+      end
     end
   end
 
@@ -125,6 +132,8 @@ class UrtBot
             urt.rcon cmd
             reply "[SENT] \\rcon #{cmd}"
           end
+        when /^#{@comchar}urtnews/
+          reply(news, true)
         when /^#{@comchar}gear (.*)/
           origline = $1
           begin
