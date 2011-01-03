@@ -199,7 +199,7 @@ loop do
   if current_host == 'devel001' or current_host == 'internal001'
     bot = UrtBot.new('bam', ['#offtopic', '#bots', '#programming'], '\.', 'irc.ninthbit.net', 6667, false)
   else
-    bot = UrtBot.new("bam#{rand 100}", ['#programming'], '-', 'irc.ninthbit.net', 6667, false) # Yay crappy irc networks which only have like 3% of servers that support ssl.
+    bot = UrtBot.new("bam#{rand 100}", ['#programming'], '-', 'irc.ninthbit.net', 6667, false)
   end
 
   bot.run
