@@ -172,7 +172,7 @@ class UrtBot
   
   def run
     while line = @socket.gets
-      # Reload the passwords file every time, so we don't have to restart the bot every time.
+      # Reload the passwords file every time, so we don't have to restart the bot every time the file is changed.
       @rcon = YAML.load_file(File.join(File.dirname(__FILE__), 'rcon.yml'))
       puts line
       case line
