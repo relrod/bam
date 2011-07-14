@@ -59,7 +59,7 @@ class UrtBot
       weapons = case weapons.size
       when 0
         'knives'
-      when 6
+      when 7
         'all weapons'
       else
         weapons.join(', ')
